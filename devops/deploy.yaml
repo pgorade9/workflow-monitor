@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: workflow-monitor
+  namespace: osdu
+spec:
+  selector:
+    app: workflow-monitor
+  ports:
+  - protocol: "TCP"
+    port: 8080
+    targetPort: 8080
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workflow-monitor
+  namespace: osdu
+spec:
+  selector:
+    matchLabels:
+      app: workflow-monitor
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: workflow-monitor
+    spec:
+      containers:
+      - name: workflow-monitor
+        image: osdur3mvpcrdevxmngcr.azurecr.io/workflow-monitor:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.azure.com/agentpool
+                  operator: In
+                  values:
+                    - services
+              - matchExpressions:
+                  - key: agentpool
+                    operator: In
+                    values:
+                      - services
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - workflow-monitor
+                topologyKey: topology.kubernetes.io/zone

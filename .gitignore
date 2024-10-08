@@ -1,0 +1,10 @@
+configuration.py
+data/sql_app.db
+data/__pycache__/*
+__pycache__/*
+.venv
+.idea
+new.csv
+data_sample.csv
+data_sample.txt
+test.py
