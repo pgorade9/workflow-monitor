@@ -1,7 +1,13 @@
 import asyncio
 import json
+import logging
+import sys
 import time
+import types
 from typing import Optional, List
+
+from aiohttp import TraceConfig
+from aiohttp_retry import ExponentialRetry, RetryClient
 from retry import retry
 
 import aiohttp
@@ -13,7 +19,23 @@ from configuration import keyvault
 from data import models
 
 
+handler = logging.StreamHandler(sys.stdout)
+logging.basicConfig(handlers=[handler])
+logger = logging.getLogger(__name__)
+statuses_for_retry = {x for x in range(100, 600)}
+statuses_for_retry.remove(200)
+retry_options = ExponentialRetry(attempts=4, statuses=statuses_for_retry)
 
+async def on_request_start(
+        session: aiohttp.ClientSession,
+        trace_config_ctx: types.SimpleNamespace,
+        params: aiohttp.TraceRequestStartParams
+) -> None:
+    current_attempt = trace_config_ctx.trace_request_ctx['current_attempt']
+    if current_attempt > 1:
+        logger.warning(f"We are in attempt {current_attempt}")
+    if retry_options.attempts <= current_attempt:
+        logger.warning('Wow! We are in last attempt')
 
 TIME_OUT = 60
 
@@ -39,7 +61,7 @@ def create_workflow_payload(env, dag):
     return payload
 
 
-async def trigger_workflow(session, env, dag_name, db):
+async def trigger_workflow(env, dag_name, token, db):
     print("\nTriggering_workflow")
 
     workflow_url = f"{keyvault[env]["seds_dns_host"]}/api/workflow/v1/workflow/{dag_name}/workflowRun"
@@ -47,53 +69,54 @@ async def trigger_workflow(session, env, dag_name, db):
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'data-partition-id': keyvault[env]["data_partition_id"],
-        'Authorization': get_token(env)
+        'Authorization': token
     }
     payload = create_workflow_payload(env, dag_name)
 
-    try:
-        async with session.post(workflow_url, headers=headers, data=json.dumps(payload), timeout=TIME_OUT) as response:
-            if response.status == 200:
-                workflow_response_json = await response.json()
-                workflow_response_json['correlation-id'] = response.headers['correlation-id']
-                db_corr_item = models.CorrelationIds(env=env, dag=dag_name,
-                                                     corrId=response.headers['correlation-id'],
-                                                     runId=workflow_response_json['runId'],
-                                                     fileId=keyvault[env]["file_id"][dag_name])
-                db.add(db_corr_item)
-                db.commit()
-                db.refresh(db_corr_item)
-                return workflow_response_json
-            else:
-                print(f"Bad Request {response.text}")
-    except Exception as e:
-        print(f"Error occurred while triggerring workflow for {env=} with {dag_name=}")
-        print(f"Error: {e}")
+    trace_config = TraceConfig()
+    trace_config.on_request_start.append(on_request_start)
+    retry_client = RetryClient(retry_options=retry_options, trace_configs=[trace_config])
+
+    response = await retry_client.post(workflow_url, headers=headers, data=json.dumps(payload), timeout=TIME_OUT,
+                                       retry_options=retry_options)
+    workflow_response_json = await response.json()
+    await retry_client.close()
+    if response.status == 200:
+        # workflow_response_json['correlation-id'] = response.headers['correlation-id']
+        db_corr_item = models.CorrelationIds(env=env, dag=dag_name,
+                                             corrId=response.headers['correlation-id'],
+                                             runId=workflow_response_json['runId'],
+                                             fileId=keyvault[env]["file_id"][dag_name])
+        db.add(db_corr_item)
+        db.commit()
+        db.refresh(db_corr_item)
 
 
 async def async_workflow(envs, dags, db:Session):
-    async with aiohttp.ClientSession() as aio_session:
-        tasks = [trigger_workflow(aio_session, env, dag, db) for env in envs for dag in dags]
-        start_time = int(time.time())
+    # tasks = [trigger_workflow(env, dag, db) for env in envs for dag in dags]
 
+    start_time = int(time.time())
+    for env in envs:
+        token = get_token(env)
+        tasks = [trigger_workflow(env, dag, token, db) for dag in dags]
         await asyncio.gather(*tasks)
-        end_time = int(time.time())
-        net_time = end_time - start_time
-        runs = len(db.query(models.CorrelationIds).all())
+    end_time = int(time.time())
+    net_time = end_time - start_time
 
-        db_time = db.query(models.TaskTimer).filter(models.TaskTimer.task == "TRIGGER_WORKFLOW").first()
-        if db_time is not None:
-            db_time.startTime = start_time
-            db_time.endTime = end_time
-            db_time.netTime = net_time
-            db_time.runs = runs
-        else:
-            db_time = models.TaskTimer(task="TRIGGER_WORKFLOW", startTime=start_time, endTime=end_time,
-                                       netTime=net_time,
-                                       runs=runs)
-        db.add(db_time)
-        db.commit()
-        db.refresh(db_time)
+    runs = len(db.query(models.CorrelationIds).all())
+    db_time = db.query(models.TaskTimer).filter(models.TaskTimer.task == "TRIGGER_WORKFLOW").first()
+    if db_time is not None:
+        db_time.startTime = start_time
+        db_time.endTime = end_time
+        db_time.netTime = net_time
+        db_time.runs = runs
+    else:
+        db_time = models.TaskTimer(task="TRIGGER_WORKFLOW", startTime=start_time, endTime=end_time,
+                                   netTime=net_time,
+                                   runs=runs)
+    db.add(db_time)
+    db.commit()
+    db.refresh(db_time)
 
 @retry(exceptions=Exception, tries=2, delay=1)
 async def global_status(session, env, dag_name, correlation_Id, token, db: Session):
