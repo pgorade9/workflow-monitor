@@ -1,11 +1,14 @@
+# local configuration
 configuration.py
+
+#subfolders
 data/sql_app.db
 data/__pycache__/*
+output/*
 __pycache__/*
-.venv
-.idea
+
+# Test files
 new.csv
 data_sample.csv
 data_sample.txt
 test.py
-output/*
