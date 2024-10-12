@@ -52,6 +52,22 @@ def get_from_db(corr_id: str, db: Session = Depends(get_db)):
 def test():
     return {"Hello": 'world'}
 
+@app.get("/get-corrIds")
+def get_corr_Ids(db: Session = Depends(get_db)):
+    envs = keyvault['envs-ltops']
+    dags = keyvault['dags-ltops']
+    correlationIds = {}
+
+    for env in envs:
+        correlationIds[env] = {}
+
+        for dag in dags:
+            corr_item = db.query(models.CorrelationIds).filter(models.CorrelationIds.env == env,
+                                                               models.CorrelationIds.dag == dag).first()
+            if corr_item is not None:
+                correlationIds[env][dag] = corr_item.corrId
+
+    return correlationIds
 
 @app.get("/load-data", response_class=HTMLResponse)
 def load_data(request: Request, db: Session = Depends(get_db)):
