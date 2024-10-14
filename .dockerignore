@@ -1,0 +1,5 @@
+#subfolders
+data/sql_app.db
+data/__pycache__/*
+output/*
+__pycache__/*

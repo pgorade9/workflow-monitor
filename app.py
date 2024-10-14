@@ -80,7 +80,7 @@ def load_data(request: Request, db: Session = Depends(get_db)):
             db_data = models.CorrelationIds(env=env, dag=dag, corrId=corrId, runId=runId, fileId=fileId)
             db.add(db_data)
             db.commit()
-    return RedirectResponse("http://localhost:8080/home")
+    return RedirectResponse("http://localhost:80/home")
 
 
 @app.get("/write-data", response_class=HTMLResponse)
@@ -89,7 +89,7 @@ def write_data(request: Request, db: Session = Depends(get_db)):
     with open(DATA_SAMPLE, "w") as fp:
         for row in corr_objects:
             fp.write(f"{row.env},{row.dag},{row.corrId},{row.runId},{row.fileId}\n")
-    return RedirectResponse("http://localhost:8080/home")
+    return RedirectResponse("http://localhost:80/home")
 
 
 def write_excel_workflows(db,envs,dags):
@@ -192,7 +192,7 @@ async def clear_db(db: Session = Depends(get_db)):
     db.query(models.WorkflowStatus).delete(synchronize_session=False)
     db.query(models.TaskTimer).delete(synchronize_session=False)
     db.commit()
-    return RedirectResponse("http://localhost:8080/home")
+    return RedirectResponse("http://localhost:80/home")
 
 
 @app.get("/update")
@@ -201,7 +201,7 @@ def update(db: Session = Depends(get_db)):
     tasks = BackgroundTasks()
     tasks.add_task(async_workflow_status, db)
     tasks.add_task(async_gsm, db)
-    return RedirectResponse("http://localhost:8080/home", background=tasks)
+    return RedirectResponse("http://localhost:80/home", background=tasks)
 
 
 @app.get("/stop-update")
@@ -209,7 +209,7 @@ def stop_update(db: Session = Depends(get_db)):
     print(f"Stopping all Updates...............")
     global setTimeOut
     setTimeOut = False
-    return RedirectResponse("http://localhost:8080/home")
+    return RedirectResponse("http://localhost:80/home")
 
 
 @app.get("/trigger/workflow/saas")
@@ -226,7 +226,7 @@ def trigger_workflow_saas(db: Session = Depends(get_db)):
     tasks.add_task(trigger_workflow, dags, envs, db)
     tasks.add_task(write_excel_workflows, db, envs, dags)
 
-    return RedirectResponse("http://localhost:8080/home",background=tasks)
+    return RedirectResponse("http://localhost:80/home",background=tasks)
 
 
 
@@ -244,7 +244,7 @@ def trigger_workflow_ltops(db: Session = Depends(get_db)):
     tasks.add_task(trigger_workflow,dags, envs, db)
     tasks.add_task(write_excel_workflows, db, envs, dags)
 
-    return RedirectResponse("http://localhost:8080/home", background=tasks)
+    return RedirectResponse("http://localhost:80/home", background=tasks)
 
 
 def setEnvironmentsFunc(value:str):
@@ -257,4 +257,4 @@ def trigger_workflow(dags, envs, db):
 
 
 if __name__ == "__main__":
-    uvicorn.run('app:app', port=8080, host="127.0.0.1", reload=True)
+    uvicorn.run('app:app', port=80, host="0.0.0.0", reload=True)

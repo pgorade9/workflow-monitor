@@ -8,8 +8,8 @@ spec:
     app: workflow-monitor
   ports:
   - protocol: "TCP"
-    port: 8080
-    targetPort: 8080
+    port: 80
+    targetPort: 80
   type: ClusterIP
 
 ---
@@ -34,7 +34,7 @@ spec:
         image: osdur3mvpcrdevxmngcr.azurecr.io/workflow-monitor:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 8080
+        - containerPort: 80
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
