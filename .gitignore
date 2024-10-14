@@ -2,6 +2,7 @@
 configuration.py
 
 #subfolders
+.idea/
 data/sql_app.db
 data/__pycache__/*
 output/*
