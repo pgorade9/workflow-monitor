@@ -47,10 +47,10 @@ def get_from_db(corr_id: str, db: Session = Depends(get_db)):
     return db_corr_item
 
 
-
 @app.get("/")
 def test():
     return {"Hello": 'world'}
+
 
 @app.get("/get-corrIds")
 def get_corr_Ids(db: Session = Depends(get_db)):
@@ -68,6 +68,7 @@ def get_corr_Ids(db: Session = Depends(get_db)):
                 correlationIds[env][dag] = corr_item.corrId
 
     return correlationIds
+
 
 @app.get("/load-data", response_class=HTMLResponse)
 def load_data(request: Request, db: Session = Depends(get_db)):
@@ -92,12 +93,13 @@ def write_data(request: Request, db: Session = Depends(get_db)):
     return RedirectResponse("http://localhost:80/home")
 
 
-def write_excel_workflows(db,envs,dags):
+def write_excel_workflows(db, envs, dags):
     data = {}
     for env in envs:
         data[env] = {}
         for dag in dags:
-            item = db.query(models.CorrelationIds).filter(models.CorrelationIds.env == env,models.CorrelationIds.dag == dag).first()
+            item = db.query(models.CorrelationIds).filter(models.CorrelationIds.env == env,
+                                                          models.CorrelationIds.dag == dag).first()
             if item is not None:
                 data[env][dag] = item.corrId
             else:
@@ -106,14 +108,29 @@ def write_excel_workflows(db,envs,dags):
     df.to_excel("output/workflowRun_correlationIds.xlsx")
 
 
-def write_excel_gsm(db,envs,dags):
+def write_excel_runIds(db, envs, dags):
+    data = {}
+    for env in envs:
+        data[env] = {}
+        for dag in dags:
+            item = db.query(models.CorrelationIds).filter(models.CorrelationIds.env == env,
+                                                          models.CorrelationIds.dag == dag).first()
+            if item is not None:
+                data[env][dag] = item.runId
+            else:
+                data[env][dag] = "-"
+    df = pd.DataFrame(data)
+    df.to_excel("output/workflowRun_runIds.xlsx")
+
+
+def write_excel_gsm(db, envs, dags):
     data = {}
     for env in envs:
         data[env] = {}
         for dag in dags:
             data[env][dag] = []
-            items = db.query(models.GSMRecords).filter(models.GSMRecords.env == env,models.GSMRecords.dag == dag).all()
-            if len(items)>0:
+            items = db.query(models.GSMRecords).filter(models.GSMRecords.env == env, models.GSMRecords.dag == dag).all()
+            if len(items) > 0:
                 for item in items:
                     data[env][dag].append(item.recordId)
             else:
@@ -124,7 +141,6 @@ def write_excel_gsm(db,envs,dags):
 
 @app.get("/home", response_class=HTMLResponse)
 def index(request: Request, db: Session = Depends(get_db)):
-
     if setEnvironments is None:
         envs = keyvault['envs-ltops']
         dags = keyvault['dags-ltops']
@@ -133,7 +149,7 @@ def index(request: Request, db: Session = Depends(get_db)):
             if first_entry.env in keyvault['envs']:
                 envs = keyvault['envs']
                 dags = keyvault['dags']
-    elif setEnvironments=='ltops':
+    elif setEnvironments == 'ltops':
         envs = keyvault['envs-ltops']
         dags = keyvault['dags-ltops']
     else:
@@ -141,25 +157,36 @@ def index(request: Request, db: Session = Depends(get_db)):
         dags = keyvault['dags']
 
     correlationIds = {}
+    runIds = {}
     workflow_status = {}
     gsm = {}
 
     for env in envs:
         correlationIds[env] = {}
+        runIds[env] = {}
         workflow_status[env] = {}
         gsm[env] = {}
 
         for dag in dags:
+            # Fetch Correlation Id
             corr_item = db.query(models.CorrelationIds).filter(models.CorrelationIds.env == env,
                                                                models.CorrelationIds.dag == dag).first()
             if corr_item is not None:
                 correlationIds[env][dag] = corr_item.corrId
 
+            # Fetch Run Id
+            runId_item = db.query(models.CorrelationIds).filter(models.CorrelationIds.env == env,
+                                                                models.CorrelationIds.dag == dag).first()
+            if corr_item is not None:
+                runIds[env][dag] = runId_item.runId
+
+            # Fetch Workflow Status
             workflow_status_item = db.query(models.WorkflowStatus).filter(models.WorkflowStatus.env == env,
                                                                           models.WorkflowStatus.dag == dag).first()
             if workflow_status_item is not None:
                 workflow_status[env][dag] = workflow_status_item.status
 
+            # Fetch GSM status
             gsm_items = db.query(models.GSMRecords).filter(models.GSMRecords.env == env,
                                                            models.GSMRecords.dag == dag).all()
             if len(gsm_items) > 0:
@@ -173,14 +200,15 @@ def index(request: Request, db: Session = Depends(get_db)):
     net_time = query_netTime.netTime if query_netTime is not None else 0
 
     tasks = BackgroundTasks()
-    tasks.add_task(write_excel_workflows,db,envs,dags)
+    tasks.add_task(write_excel_workflows, db, envs, dags)
     tasks.add_task(write_excel_gsm, db, envs, dags)
+    tasks.add_task(write_excel_runIds, db, envs, dags)
 
     return templates.TemplateResponse(name="index.html", request=request,
-                                      context={'result': correlationIds, 'gsm': gsm, 'workflow_status': workflow_status,
+                                      context={'result': correlationIds, 'runIds': runIds, 'gsm': gsm,
+                                               'workflow_status': workflow_status,
                                                'envs': envs, 'dags': dags, 'runs': runs,
-                                               'net_time': net_time,'setTimeOut': setTimeOut}, background=tasks)
-
+                                               'net_time': net_time, 'setTimeOut': setTimeOut}, background=tasks)
 
 
 @app.get("/clear")
@@ -226,8 +254,7 @@ def trigger_workflow_saas(db: Session = Depends(get_db)):
     tasks.add_task(trigger_workflow, dags, envs, db)
     tasks.add_task(write_excel_workflows, db, envs, dags)
 
-    return RedirectResponse("http://localhost:80/home",background=tasks)
-
+    return RedirectResponse("http://localhost:80/home", background=tasks)
 
 
 @app.get("/trigger/workflow/ltops")
@@ -241,13 +268,13 @@ def trigger_workflow_ltops(db: Session = Depends(get_db)):
 
     tasks = BackgroundTasks()
     tasks.add_task(setEnvironmentsFunc, 'ltops')
-    tasks.add_task(trigger_workflow,dags, envs, db)
+    tasks.add_task(trigger_workflow, dags, envs, db)
     tasks.add_task(write_excel_workflows, db, envs, dags)
 
     return RedirectResponse("http://localhost:80/home", background=tasks)
 
 
-def setEnvironmentsFunc(value:str):
+def setEnvironmentsFunc(value: str):
     global setEnvironments
     setEnvironments = value
 

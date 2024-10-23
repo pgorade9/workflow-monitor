@@ -137,10 +137,54 @@
 
             </div>
                     <br>
-
             <div class="row">
                 <div class="col" >
-                    <table class="table bg-light" id="table-2">
+                    <table class="table table-responsive-sm bg-light" id="table-2">
+                        <caption style="caption-side:top"><h3>Workflow Run Ids</h3></caption>
+                        <tr>
+                           <th scope="col" rowspan="2" {{ header_style }}>DAG Name</th>
+                            <th scope="col" colspan="{{ envs.__len__()-1 }}" {{ header_style }}>Environments</th>
+                            <th><form action="{{ url_for('excel_bin', path='/workflowRun_runIds.xlsx') }}">
+                                    <input type="submit" value="Download" class="btn btn-success"/>
+                                </form>
+                            </th>
+                        </tr>
+                        <tr>
+                            {% for env in envs %}
+                            <th scope="col" {{ header_style }}>{{ env_key_vault[env] }}</th>
+                            {% endfor %}
+                        </tr>
+
+                        {% for dag in dags %}
+                        <tr>
+                            {% set dag_key_vault = { 'csv_parser_wf_status_gsm':'CSV',
+                            'wellbore_ingestion_wf_gsm':'Wellbore',
+                            'doc_ingestor_azure_ocr_wf':'Document',
+                            'shapefile_ingestor_wf_status_gsm':'Shapefile'} %}
+
+                            <td scope="col" {{ header_style }}>{{ dag_key_vault[dag] }}</td>
+                            {% for env in envs %}
+
+                             {% if runIds[env] is defined %}
+                                {% if runIds[env][dag] is defined %}
+                                    <td>{{ runIds[env][dag] }}</td>
+                                {% else %}
+                                    <td style="text-align:center">{{ "-" }}</td>
+                                {% endif %}
+                            {% else %}
+                                    <td style="text-align:center">{{ "-" }}</td>
+                            {% endif %}
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                  </table>
+                </div>
+
+            </div>
+                    <br>
+            <div class="row">
+                <div class="col" >
+                    <table class="table bg-light" id="table-3">
                         <caption style="caption-side:top"><h3>Workflow Status</h3></caption>
                         <tr>
                            <th scope="col" rowspan="2" {{ header_style }}>DAG Name</th>
@@ -176,8 +220,8 @@
                     <br>
             <div class="row">
                 <div class="col">
-                    <table class="table bg-light" id="table-3">
-                        <caption style="caption-side:top"><h3>Workflow Records Ids</h3></caption>
+                    <table class="table bg-light" id="table-4">
+                        <caption style="caption-side:top"><h3>Workflow Records Ids (GSM)</h3></caption>
                         <tr>
                            <th rowspan="2" scope="col" {{ header_style }}>DAG Name</th>
                             <th scope="col" colspan="{{ envs.__len__()-1 }}" {{ header_style }}>Environments</th>
