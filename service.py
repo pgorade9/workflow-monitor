@@ -18,13 +18,13 @@ from sqlalchemy.orm import Session
 from configuration import keyvault
 from data import models
 
-
 handler = logging.StreamHandler(sys.stdout)
 logging.basicConfig(handlers=[handler])
 logger = logging.getLogger(__name__)
 statuses_for_retry = {x for x in range(100, 600)}
 statuses_for_retry.remove(200)
 retry_options = ExponentialRetry(attempts=4, statuses=statuses_for_retry)
+
 
 async def on_request_start(
         session: aiohttp.ClientSession,
@@ -37,7 +37,9 @@ async def on_request_start(
     if retry_options.attempts <= current_attempt:
         logger.warning('Wow! We are in last attempt')
 
+
 TIME_OUT = 60
+
 
 def get_token(env):
     response = requests.request(method="POST",
@@ -92,7 +94,7 @@ async def trigger_workflow(env, dag_name, token, db):
         db.refresh(db_corr_item)
 
 
-async def async_workflow(envs, dags, db:Session):
+async def async_workflow(envs, dags, db: Session):
     # tasks = [trigger_workflow(env, dag, db) for env in envs for dag in dags]
 
     start_time = int(time.time())
@@ -118,6 +120,7 @@ async def async_workflow(envs, dags, db:Session):
     db.commit()
     db.refresh(db_time)
 
+
 @retry(exceptions=Exception, tries=2, delay=1)
 async def global_status(session, env, dag_name, correlation_Id, token, db: Session):
     print(f"Fetching status of {correlation_Id=} for {dag_name=} on {env=}")
@@ -131,7 +134,7 @@ async def global_status(session, env, dag_name, correlation_Id, token, db: Sessi
     payload["statusQuery"]["correlationId"] = correlation_Id
 
     try:
-        async with session.post(gsm_url, headers=headers, data=json.dumps(payload),timeout=TIME_OUT) as response:
+        async with session.post(gsm_url, headers=headers, data=json.dumps(payload), timeout=TIME_OUT) as response:
             response_json = await response.json()
             print(response.status)
             if response.status == 200:
@@ -187,7 +190,7 @@ async def async_gsm(db):
     print("===================== Hey I was called by background task ======================")
     async with aiohttp.ClientSession() as aio_session:
         reference_set = [(item.env, item.dag, item.corrId) for item in db.query(models.CorrelationIds)]
-        if len(reference_set)>0:
+        if len(reference_set) > 0:
             relevant_set = []
             for item in reference_set:
                 record = db.query(models.GSMRecords).filter(models.GSMRecords.corrId == item[2]).first()
@@ -256,14 +259,15 @@ async def async_workflow_status(db):
                                                                 models.WorkflowStatus.dag == item[1]).first()
                 if record is None:
                     relevant_workflow_set.append(item)
-                elif record.status in ["submitted","running"] :
+                elif record.status in ["submitted", "running"]:
                     relevant_workflow_set.append(item)
             print(f"{relevant_workflow_set=}")
             envs = set([run[0] for run in relevant_workflow_set])
             token_map = {env: get_token(env) for env in envs}
             # start_time = int(time.time())
             await asyncio.gather(
-                *[workflow_status(aio_session, run[0], run[1], run[2], token_map[run[0]], db) for run in relevant_workflow_set])
+                *[workflow_status(aio_session, run[0], run[1], run[2], token_map[run[0]], db) for run in
+                  relevant_workflow_set])
             # end_time = int(time.time())
             # net_time = end_time - start_time
             # db_time = models.TaskTimer(task="WORKFLOW_STATUS_QUERY", startTime=start_time, endTime=end_time,

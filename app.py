@@ -284,4 +284,4 @@ def trigger_workflow(dags, envs, db):
 
 
 if __name__ == "__main__":
-    uvicorn.run('app:app', port=80, host="0.0.0.0", reload=True)
+    uvicorn.run('app:app', port=80, host="127.0.0.1", reload=True)
