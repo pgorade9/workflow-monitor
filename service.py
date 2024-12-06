@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 
 from configuration import keyvault
 from data import models
+from workflow_payload_templates import get_workflow_payload
 
 handler = logging.StreamHandler(sys.stdout)
 logging.basicConfig(handlers=[handler])
@@ -74,7 +75,13 @@ async def trigger_workflow(env, dag_name, token, db):
         'Authorization': token
     }
     # payload = create_workflow_payload(env, dag_name)
-    payload = create_workflow_payload(env, dag_name)
+    payload = get_workflow_payload(dag_name,
+                                   keyvault[env]["data_partition_id"],
+                                   keyvault[env]["adme_dns_host"],
+                                   token,
+                                   keyvault[env]["happy_me_subscription_key"],
+                                   keyvault[env]["file_id"][dag_name],
+                                   keyvault["file_name"][dag_name])
 
     trace_config = TraceConfig()
     trace_config.on_request_start.append(on_request_start)
