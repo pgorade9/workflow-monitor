@@ -9,9 +9,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
-from service import async_workflow, async_gsm, async_workflow_status
+from src.service.workflow_gsm_service import async_workflow, async_gsm, async_workflow_status
+from src.constants.constants import DATA_SAMPLE
 from configuration import keyvault
-from constants import DATA_SAMPLE
+
 from data import models, schemas, crud
 from data.database import engine, SessionLocal
 

@@ -16,8 +16,8 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from configuration import keyvault
-from data import models
-from workflow_payload_templates import get_workflow_payload
+from src.data import models
+from src.service.workflow_template import get_workflow_payload
 
 handler = logging.StreamHandler(sys.stdout)
 logging.basicConfig(handlers=[handler])

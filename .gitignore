@@ -3,13 +3,13 @@ configuration.py
 
 #subfolders
 .idea/
-data/sql_app.db
-data/__pycache__/*
+src/data/sql_app.db
+src/data/__pycache__/*
 output/*
 __pycache__/*
 
 # Test files
-new.csv
-data_sample.csv
-data_sample.txt
-test.py
+src/test/new.csv
+output/data_sample.csv
+src/test/data_sample.txt
+src/test/test.py
