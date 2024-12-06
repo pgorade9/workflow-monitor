@@ -13,8 +13,8 @@ from src.service.workflow_gsm_service import async_workflow, async_gsm, async_wo
 from src.constants.constants import DATA_SAMPLE
 from configuration import keyvault
 
-from data import models, schemas, crud
-from data.database import engine, SessionLocal
+from src.data import models, schemas, crud
+from src.data.database import engine, SessionLocal
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
