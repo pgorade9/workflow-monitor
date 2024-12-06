@@ -70,7 +70,8 @@
             {% set dag_key_vault = { 'csv_parser_wf_status_gsm':'CSV',
                             'wellbore_ingestion_wf_gsm':'Wellbore',
                             'doc_ingestor_azure_ocr_wf':'Document',
-                            'shapefile_ingestor_wf_status_gsm':'Shapefile'} %}
+                            'shapefile_ingestor_wf_status_gsm':'Shapefile',
+                            'Osdu_ingest':'Manifest'} %}
             {% set env_key_vault = {
                             'evd':'EVD',
                             'evt':'EVT',
@@ -115,7 +116,8 @@
                             {% set dag_key_vault = { 'csv_parser_wf_status_gsm':'CSV',
                             'wellbore_ingestion_wf_gsm':'Wellbore',
                             'doc_ingestor_azure_ocr_wf':'Document',
-                            'shapefile_ingestor_wf_status_gsm':'Shapefile'} %}
+                            'shapefile_ingestor_wf_status_gsm':'Shapefile',
+                            'Osdu_ingest':'Manifest'} %}
 
                             <td scope="col" {{ header_style }}>{{ dag_key_vault[dag] }}</td>
                             {% for env in envs %}
@@ -160,7 +162,8 @@
                             {% set dag_key_vault = { 'csv_parser_wf_status_gsm':'CSV',
                             'wellbore_ingestion_wf_gsm':'Wellbore',
                             'doc_ingestor_azure_ocr_wf':'Document',
-                            'shapefile_ingestor_wf_status_gsm':'Shapefile'} %}
+                            'shapefile_ingestor_wf_status_gsm':'Shapefile',
+                            'Osdu_ingest':'Manifest'} %}
 
                             <td scope="col" {{ header_style }}>{{ dag_key_vault[dag] }}</td>
                             {% for env in envs %}
