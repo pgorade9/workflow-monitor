@@ -73,6 +73,7 @@ async def trigger_workflow(env, dag_name, token, db):
         'data-partition-id': keyvault[env]["data_partition_id"],
         'Authorization': token
     }
+    # payload = create_workflow_payload(env, dag_name)
     payload = create_workflow_payload(env, dag_name)
 
     trace_config = TraceConfig()

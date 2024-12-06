@@ -201,15 +201,26 @@
                             <td scope="col" {{ header_style }}>{{ dag_key_vault[dag] }}</td>
                             {% for env in envs %}
 
-                             {% if workflow_status[env] is defined %}
-                                {% if workflow_status[env][dag] is defined %}
-                                    <td style="text-align:center">{{ workflow_status[env][dag] }}</td>
+                                {% if workflow_status[env] is defined %}
+                                    {% if workflow_status[env][dag] is defined %}
+                                        {% if workflow_status[env][dag] == "finished" or workflow_status[env][dag] == "success" %}
+                                            <td class="table-success">{{ workflow_status[env][dag] }}</td>
+                                        {% endif %}
+                                        {% if workflow_status[env][dag] == "failed" %}
+                                            <td class="table-danger">{{ workflow_status[env][dag] }}</td>
+                                        {% endif %}
+                                        {% if workflow_status[env][dag] == "running" %}
+                                            <td class="table-warning">{{ workflow_status[env][dag] }}</td>
+                                        {% endif %}
+                                        {% if workflow_status[env][dag] == "submitted" %}
+                                            <td class="table-secondary">{{ workflow_status[env][dag] }}</td>
+                                        {% endif %}
+                                    {% else %}
+                                        <td style="text-align:center">{{ "-" }}</td>
+                                    {% endif %}
                                 {% else %}
-                                    <td style="text-align:center">{{ "-" }}</td>
+                                        <td style="text-align:center">{{ "-" }}</td>
                                 {% endif %}
-                            {% else %}
-                                    <td style="text-align:center">{{ "-" }}</td>
-                            {% endif %}
                             {% endfor %}
                         </tr>
                         {% endfor %}
