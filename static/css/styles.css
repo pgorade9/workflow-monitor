@@ -22,12 +22,12 @@ td, th, tr{
     overflow-wrap: break-word;
 }
 
-#table-1, #table-2, #table-3 #table-4{
-    box-shadow: 10px 10px 10px 10px rgb(143, 212, 160);
+#table-1, #table-2, #table-3, #table-4{
+    box-shadow: 10px 10px 10px 10px rgb(109, 160, 121);
 }
 
 
 
 #body-tag {
- background-color: rgb(219, 231, 231);
+    background-color: rgb(219, 231, 231);
 }
