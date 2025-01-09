@@ -8,26 +8,45 @@
     max-width: 85%;
 }
 
+table caption {
+    caption-side:top;
+    color: white;
+    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-weight: bolder;
+    padding-left: 20px;
+    background-color: rgb(224, 200, 66);
+}
 
+caption.triggerTimeMsg{
+    color: gray
+}
 
 table {
     table-layout: fixed;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 td, th, tr{
-    font-family: "Gill Sans", sans-serif;
+    font-family: "Gill Sans", sans-serif, bold;
     max-width: 0;
     overflow: hidden;
     overflow-wrap: break-word;
+    background-color: #afbe4e;
+    color: white
 }
+
+
+.navbar, .navbar-dark{
+    background-color: #afbe4e;
+    box-shadow: 10px 10px 10px 10px rgb(160, 165, 103);
+}
+
 
 #table-1, #table-2, #table-3, #table-4{
-    box-shadow: 10px 10px 10px 10px rgb(109, 160, 121);
+    box-shadow: 10px 10px 10px 10px rgb(160, 165, 103);
 }
 
 
-
-#body-tag {
-    background-color: rgb(219, 231, 231);
+#body_tag {
+    background-color: rgb(237, 230, 190);
 }

@@ -15,9 +15,9 @@
         <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
     </head>
     {% if setTimeOut %}
-    <body id="body-tag" onload="load()">
+    <body id="body_tag" onload="load()">
     {% else %}
-    <body id="body-tag">
+    <body id="body_tag">
     {% endif %}
         <div class="container">
 
@@ -28,7 +28,7 @@
                      </a>
                  </div>
                 <div class="col" id="navbar" >
-                    <nav class="navbar navbar-dark" style="background-color: #26a812;">
+                    <nav class="navbar navbar-dark">
                       <a class="navbar-brand" href="http://localhost:80/home">Workflows</a>
                       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
@@ -65,7 +65,7 @@
             </div>
 
             {% set header_style %}
-                style="color:green;font-size: 14px;font-weight: bold;text-align:center"
+                style="color:white;font-size: 14px;font-weight: bold;text-align:center"
             {% endset %}
             {% set dag_key_vault = { 'csv_parser_wf_status_gsm':'CSV',
                             'wellbore_ingestion_wf_gsm':'Wellbore',
@@ -86,6 +86,7 @@
                             'evd-ltops':'EVD',
                             'evt-ltops':'EVT',
                             'adme-outerloop':'ADME-OUTERLOOP',
+                            'mde-ltops':'MDE',
                             'prod-canary-ltops':'PROD-CANARY',
                             'prod-aws-ltops':'PROD-AWS'} %}
 
@@ -94,10 +95,10 @@
                 <div class="col" >
                     <table class="table table-responsive-sm bg-light" id="table-1">
                         {% if net_time > 0 %}
-                        <caption style="color:gray;caption-side:top">Triggered {{ runs }} workflows in {{ net_time }} seconds</caption>
-                            <caption style="caption-side:top"><h3>Workflow Correlation Ids</h3></caption>
+                        <caption class="triggerTimeMsg">Triggered {{ runs }} workflows in {{ net_time }} seconds</caption>
+                            <caption><h3>Workflow Correlation Ids</h3></caption>
                         {% else %}
-                            <caption style="caption-side:top"><h3>Workflow Correlation Ids</h3></caption>
+                            <caption><h3>Workflow Correlation Ids</h3></caption>
                         {% endif %}
 
                         <tr>
@@ -145,7 +146,7 @@
             <div class="row">
                 <div class="col" >
                     <table class="table table-responsive-sm bg-light" id="table-2">
-                        <caption style="caption-side:top"><h3>Workflow Run Ids</h3></caption>
+                        <caption ><h3>Workflow Run Ids</h3></caption>
                         <tr>
                            <th scope="col" rowspan="2" {{ header_style }}>DAG Name</th>
                             <th scope="col" colspan="{{ envs.__len__()-1 }}" {{ header_style }}>Environments</th>
@@ -191,7 +192,7 @@
             <div class="row">
                 <div class="col" >
                     <table class="table bg-light" id="table-3">
-                        <caption style="caption-side:top"><h3>Workflow Status</h3></caption>
+                        <caption ><h3>Workflow Status</h3></caption>
                         <tr>
                            <th scope="col" rowspan="2" {{ header_style }}>DAG Name</th>
                             <th scope="col" colspan="{{ envs.__len__() }}" {{ header_style }}>Environments</th>
@@ -238,7 +239,7 @@
             <div class="row">
                 <div class="col">
                     <table class="table bg-light" id="table-4">
-                        <caption style="caption-side:top"><h3>Workflow Records Ids (GSM)</h3></caption>
+                        <caption ><h3>Workflow Records Ids (GSM)</h3></caption>
                         <tr>
                            <th rowspan="2" scope="col" {{ header_style }}>DAG Name</th>
                             <th scope="col" colspan="{{ envs.__len__()-1 }}" {{ header_style }}>Environments</th>
