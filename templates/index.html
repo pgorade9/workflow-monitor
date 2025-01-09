@@ -211,16 +211,16 @@
                                 {% if workflow_status[env] is defined %}
                                     {% if workflow_status[env][dag] is defined %}
                                         {% if workflow_status[env][dag] == "finished" or workflow_status[env][dag] == "success" %}
-                                            <td class="table-success text-center">{{ workflow_status[env][dag] }}</td>
+                                            <td class="success">{{ workflow_status[env][dag] }}</td>
                                         {% endif %}
                                         {% if workflow_status[env][dag] == "failed" %}
-                                            <td class="table-danger text-center">{{ workflow_status[env][dag] }}</td>
+                                            <td class="failed">{{ workflow_status[env][dag] }}</td>
                                         {% endif %}
                                         {% if workflow_status[env][dag] == "running" %}
-                                            <td class="table-warning text-center">{{ workflow_status[env][dag] }}</td>
+                                            <td class="running">{{ workflow_status[env][dag] }}</td>
                                         {% endif %}
                                         {% if workflow_status[env][dag] == "submitted" %}
-                                            <td class="table-secondary text-center">{{ workflow_status[env][dag] }}</td>
+                                            <td class="submitted">{{ workflow_status[env][dag] }}</td>
                                         {% endif %}
                                     {% else %}
                                         <td class="table-secondary text-center">{{ "-" }}</td>

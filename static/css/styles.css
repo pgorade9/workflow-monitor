@@ -50,3 +50,19 @@ td, th, tr{
 #body_tag {
     background-color: rgb(237, 230, 190);
 }
+
+.success {
+    background-color: rgb(82, 150, 82);
+}
+
+.failed {
+    background-color: rgb(218, 125, 125);
+}
+
+.running {
+    background-color: yellow;
+}
+
+.submitted {
+    background-color: gray;
+}
