@@ -14,7 +14,9 @@ table caption {
     font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
     font-weight: bolder;
     padding-left: 20px;
-    background-color: rgb(224, 200, 66);
+    margin-bottom: 1px;
+    background-color: rgb(229, 201, 41);
+    box-shadow: 10px 10px 10px 10px rgb(160, 165, 103);
 }
 
 caption.triggerTimeMsg{
@@ -56,11 +58,11 @@ td, th, tr{
 }
 
 .failed {
-    background-color: rgb(218, 125, 125);
+    background-color: rgb(220, 100, 100);
 }
 
 .running {
-    background-color: yellow;
+    background-color: rgb(204, 204, 38);
 }
 
 .submitted {

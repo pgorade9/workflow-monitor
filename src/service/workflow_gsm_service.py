@@ -224,9 +224,10 @@ async def async_gsm(db):
 
 async def workflow_status(session, env, dag_name, run_Id, token, db):
     print(f"Fetching Workflow status of {run_Id=} for {dag_name=} on {env=}")
-
+    data_partition_id = keyvault[env]["data_partition_id"]
+    # dag_name = f"{dag_name}_mde" if "mde" in data_partition_id else dag_name
     workflow_url = f"{keyvault[env]["seds_dns_host"]}/api/workflow/v1/workflow/{dag_name}/workflowRun/{run_Id}"
-    headers = {'data-partition-id': keyvault[env]["data_partition_id"],
+    headers = {'data-partition-id': data_partition_id,
                'Content-Type': 'application/json',
                'Authorization': token,
                }
