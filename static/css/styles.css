@@ -11,7 +11,7 @@
 table caption {
     caption-side:top;
     color: white;
-    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-weight: bolder;
     padding-left: 20px;
     margin-bottom: 1px;
@@ -55,16 +55,20 @@ td, th, tr{
 
 .success {
     background-color: rgb(82, 150, 82);
+    font-weight: bolder;
 }
 
 .failed {
     background-color: rgb(220, 100, 100);
+    font-weight: bolder;
 }
 
 .running {
-    background-color: rgb(204, 204, 38);
+    background-color: rgb(225, 225, 23);
+    font-weight: bolder;
 }
 
 .submitted {
     background-color: gray;
+    font-weight: bolder;
 }
