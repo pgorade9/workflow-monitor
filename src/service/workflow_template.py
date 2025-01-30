@@ -25,7 +25,7 @@ def get_workflow_payload(dag, data_partition_id, adme_dns_host, token, sub_key, 
                     "MasterData": [],
                     "Data": {
                         "WorkProduct": {
-                            "id": f"{data_partition_id}:work-product--WorkProduct:0d409294-effd-4103-bb89-b7fb7471c444:2abcd",
+                            "id": f"{data_partition_id}:work-product--WorkProduct:0d409294-effd-4103-bb89-b7fb7471c444:1234",
                             "kind": f"{data_partition_id}:wks:work-product--WorkProduct:1.0.0",
                             "acl": {
                                 "owners": [
@@ -47,35 +47,36 @@ def get_workflow_payload(dag, data_partition_id, adme_dns_host, token, sub_key, 
                                 "Name": f"{file_name}",
                                 "Description": "Document",
                                 "Components": [
-                                    f"{file_id}:"
+                                    # f"{file_id}:"
+                                    f"{data_partition_id}:work-product-component--WorkProduct:0d409294-effd-4103-bb89-b7fb7471c444:1234"
                                 ]
                             }
                         },
                         "WorkProductComponents": [
                             {
-                                "id": f"{file_id}",
+                                "id": f"{data_partition_id}:work-product-component--WellboreMarkerSet:0d409294-effd-4103-bb89-b7fb7471c444",
                                 "kind": f"{data_partition_id}:wks:work-product-component--WellboreMarkerSet:1.0.0",
                                 "acl": {
-                                "owners": [
-                                    f"data.default.owners@{data_partition_id}.enterprisedata.cloud.slb-ds.com"
-                                ],
-                                "viewers": [
-                                    f"data.default.viewers@{data_partition_id}.enterprisedata.cloud.slb-ds.com"
-                                ]
-                            },
+                                    "owners": [
+                                        f"data.default.owners@{data_partition_id}.enterprisedata.cloud.slb-ds.com"
+                                    ],
+                                    "viewers": [
+                                        f"data.default.viewers@{data_partition_id}.enterprisedata.cloud.slb-ds.com"
+                                    ]
+                                },
                                 "legal": {
-                                "legaltags": [
-                                    f"{data_partition_id}-default-legal"
-                                ],
-                                "otherRelevantDataCountries": [
-                                    "US"
-                                ]
-                            },
+                                    "legaltags": [
+                                        f"{data_partition_id}-default-legal"
+                                    ],
+                                    "otherRelevantDataCountries": [
+                                        "US"
+                                    ]
+                                },
                                 "data": {
                                     "Name": f"{file_name}",
                                     "Description": "Wellbore Marker",
                                     "Datasets": [
-                                        "default-qa-sis-internal-hq:dataset--File.Generic:5b718938-3635-4b6b-9d40-447ad5a816db:"
+                                        f"{file_id}:"
                                     ],
                                     "Markers": [
                                         {
@@ -204,7 +205,6 @@ def get_workflow_payload(dag, data_partition_id, adme_dns_host, token, sub_key, 
 
 
 if __name__ == "__main__":
-
     token = ""
     payload = get_workflow_payload("Osdu_Ingest",
                                    "default-qa-sis-internal-hq",
