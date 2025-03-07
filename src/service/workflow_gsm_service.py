@@ -1,4 +1,5 @@
 import asyncio
+import base64
 import json
 import logging
 import sys
@@ -64,6 +65,22 @@ def create_workflow_payload(env, dag):
     return payload
 
 
+def encode_client_credentials() -> str:
+    """
+    Combines client_id and client_secret with a colon in between and Base64 encodes the result.
+
+    :param client_id: OSDU client ID
+    :param client_secret: OSDU client secret
+    :return: Base64-encoded string of "client_id:client_secret"
+    """
+    ldap = "pgorade@slb.com"
+    oid = "b0fcd013-8218-4b3c-9787-70f1b1d603bb"
+    exp = "3600"
+    credentials = f"{ldap}:{oid}:{exp}".encode("utf-8")
+    encoded_credentials = base64.b64encode(credentials).decode("utf-8")
+    return encoded_credentials
+
+
 async def trigger_workflow(env, dag_name, token, db):
     print("\nTriggering_workflow")
 
@@ -75,13 +92,15 @@ async def trigger_workflow(env, dag_name, token, db):
         'Authorization': token
     }
     # payload = create_workflow_payload(env, dag_name)
+    sToken = encode_client_credentials()
     payload = get_workflow_payload(dag_name,
                                    keyvault[env]["data_partition_id"],
                                    keyvault[env]["adme_dns_host"],
                                    token,
                                    keyvault[env]["happy_me_subscription_key"],
                                    keyvault[env]["file_id"][dag_name],
-                                   keyvault["file_name"][dag_name])
+                                   keyvault["file_name"][dag_name],
+                                   sToken)
 
     trace_config = TraceConfig()
     trace_config.on_request_start.append(on_request_start)

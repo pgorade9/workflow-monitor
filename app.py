@@ -202,7 +202,7 @@ def index(request: Request, db: Session = Depends(get_db)):
     # query_netTime = db.query(models.TaskTimer).filter(models.TaskTimer.task == "TRIGGER_WORKFLOW").first()
     net_time = query_runs.netTime if query_runs is not None else 0
     end_time = query_runs.endTime if query_runs is not None else 0
-    time_log = datetime.fromtimestamp(end_time).strftime("%d-%b-%Y  %H:%M:%S")
+    time_log = datetime.fromtimestamp(end_time).strftime("%d-%b-%Y  %H:%M")
 
     tasks = BackgroundTasks()
     tasks.add_task(write_excel_workflows, db, envs, dags)
