@@ -85,6 +85,7 @@
                             'psb':'PSB',
                             'evd-ltops':'EVD',
                             'evt-ltops':'EVT',
+                            'mde-large-ltops': 'mPDF',
                             'adme-outerloop':'ADME-OUTERLOOP',
                             'adme-innerloop':'ADME-INNERLOOP',
                             'mde-ltops':'MDE',
@@ -193,7 +194,7 @@
             <div class="row">
                 <div class="col" >
                     <table class="table bg-light" id="table-3">
-                        <caption ><h3>Workflow Status</h3></caption>
+                        <caption ><h3>Workflow Status &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ time_log }}</h3></caption>
                         <tr>
                            <th scope="col" rowspan="2" {{ header_style }}>DAG Name</th>
                             <th scope="col" colspan="{{ envs.__len__() }}" {{ header_style }}>Environments</th>

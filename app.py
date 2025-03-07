@@ -1,5 +1,6 @@
 import asyncio
 import csv
+from datetime import datetime
 
 import pandas as pd
 import uvicorn
@@ -197,8 +198,11 @@ def index(request: Request, db: Session = Depends(get_db)):
 
     query_runs = db.query(models.TaskTimer).filter(models.TaskTimer.task == "TRIGGER_WORKFLOW").first()
     runs = query_runs.runs if query_runs is not None else 0
-    query_netTime = db.query(models.TaskTimer).filter(models.TaskTimer.task == "TRIGGER_WORKFLOW").first()
-    net_time = query_netTime.netTime if query_netTime is not None else 0
+
+    # query_netTime = db.query(models.TaskTimer).filter(models.TaskTimer.task == "TRIGGER_WORKFLOW").first()
+    net_time = query_runs.netTime if query_runs is not None else 0
+    end_time = query_runs.endTime if query_runs is not None else 0
+    time_log = datetime.fromtimestamp(end_time).strftime("%d-%b-%Y  %H:%M:%S")
 
     tasks = BackgroundTasks()
     tasks.add_task(write_excel_workflows, db, envs, dags)
@@ -209,7 +213,8 @@ def index(request: Request, db: Session = Depends(get_db)):
                                       context={'result': correlationIds, 'runIds': runIds, 'gsm': gsm,
                                                'workflow_status': workflow_status,
                                                'envs': envs, 'dags': dags, 'runs': runs,
-                                               'net_time': net_time, 'setTimeOut': setTimeOut}, background=tasks)
+                                               'net_time': net_time, 'time_log': time_log, 'setTimeOut': setTimeOut},
+                                      background=tasks)
 
 
 @app.get("/clear")
