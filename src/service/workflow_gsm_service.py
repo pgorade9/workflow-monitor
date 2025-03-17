@@ -47,7 +47,7 @@ def get_token(env):
     response = requests.request(method="POST",
                                 url=keyvault[env]["token_url"],
                                 headers={"content-type": "application/x-www-form-urlencoded"},
-                                data=f"grant_type=client_credentials&client_id={keyvault[env]["client_id"]}&client_secret={keyvault[env]["client_secret"]}&scope={keyvault[env]["scope"]}")
+                                data=f"grant_type=client_credentials&client_id={keyvault[env]["client_id"]}&client_secret={keyvault[env]["client_secret"]}&scope={keyvault[env]["scope"]} {keyvault[env]["client_id"]}")
 
     if response.status_code == 200:
         print(f"********* Token Generated Successfully ************")

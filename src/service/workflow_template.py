@@ -7,8 +7,7 @@ def get_workflow_payload(dag, data_partition_id, adme_dns_host, token, sub_key, 
     workflow_payload = {
         "executionContext": {
             "dataPartitionId": f"{data_partition_id}",
-            "id": f"{file_id}",
-            "sToken": sToken
+            "id": f"{file_id}"
         }
     }
 
