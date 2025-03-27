@@ -43,11 +43,12 @@ async def on_request_start(
 TIME_OUT = 60
 
 
-def get_token(env):
+def get_token(env: str):
+    scope = f"{keyvault[env]["scope"]} {keyvault[env]["client_id"]}" if env.startswith('ltops') else keyvault[env]["scope"]
     response = requests.request(method="POST",
                                 url=keyvault[env]["token_url"],
                                 headers={"content-type": "application/x-www-form-urlencoded"},
-                                data=f"grant_type=client_credentials&client_id={keyvault[env]["client_id"]}&client_secret={keyvault[env]["client_secret"]}&scope={keyvault[env]["scope"]} {keyvault[env]["client_id"]}")
+                                data=f"grant_type=client_credentials&client_id={keyvault[env]["client_id"]}&client_secret={keyvault[env]["client_secret"]}&scope={scope}")
 
     if response.status_code == 200:
         print(f"********* Token Generated Successfully ************")
@@ -126,7 +127,7 @@ async def async_workflow(envs, dags, db: Session):
 
     start_time = int(time.time())
     for env in envs:
-        token = get_token(env)
+        token = get_token(env) if env != "xom" else keyvault[env]["bearer-token"]
         tasks = [trigger_workflow(env, dag, token, db) for dag in dags]
         await asyncio.gather(*tasks)
     end_time = int(time.time())
